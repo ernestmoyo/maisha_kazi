@@ -112,7 +112,7 @@ app.use("/api", uploadRoutes);
 // ─── Serve React Client in Production ───────────────────────────────────────
 
 if (env.NODE_ENV === "production") {
-  const clientDist = path.resolve(import.meta.dirname, "../../client-dist");
+  const clientDist = path.resolve(import.meta.dirname, "../client-dist");
   app.use(express.static(clientDist));
 
   // SPA fallback: serve index.html for any non-API route
