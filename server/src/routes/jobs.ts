@@ -55,7 +55,11 @@ router.get(
 
     // Role-based filtering
     if (user.role === "YOUTH") {
-      where.youthId = user.id;
+      // Youth can see open jobs (to browse) + jobs assigned to them
+      where.OR = [
+        { status: "OPEN" },
+        { youthId: user.id },
+      ];
     } else if (user.role === "CLIENT") {
       where.clientId = user.id;
     }
