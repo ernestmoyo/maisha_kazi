@@ -193,6 +193,60 @@ router.get(
   })
 );
 
+// ─── POST /api/jobs/:id/apply ──────────────────────────────────────────────
+
+router.post(
+  "/:id/apply",
+  authorize("YOUTH"),
+  asyncHandler(async (req: Request, res: Response) => {
+    const user = req.user!;
+    const jobId = req.params.id as string;
+
+    const job = await prisma.job.findUnique({ where: { id: jobId } });
+    if (!job) {
+      throw new AppError("Job not found.", 404);
+    }
+
+    if (job.status !== "OPEN") {
+      throw new AppError("This job is no longer open for applications.", 400);
+    }
+
+    // Check if youth already applied
+    const existingApplication = await prisma.jobApplication.findUnique({
+      where: { jobId_youthId: { jobId, youthId: user.id } },
+    });
+
+    if (existingApplication) {
+      throw new AppError("You have already applied for this job.", 409);
+    }
+
+    const { message } = req.body as { message?: string };
+
+    const application = await prisma.jobApplication.create({
+      data: {
+        jobId,
+        youthId: user.id,
+        message: message || null,
+      },
+      include: {
+        job: { select: { id: true, title: true, serviceType: true } },
+        youth: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    // Notify coordinator(s) about the application
+    if (job.coordinatorId) {
+      await NotificationService.createNotification(
+        job.coordinatorId,
+        `${user.name} applied for job: ${job.title}`,
+        "JOB_REQUEST"
+      );
+    }
+
+    return ApiResponse.success(res, application, "Application submitted successfully", 201);
+  })
+);
+
 // ─── PATCH /api/jobs/:id/assign ─────────────────────────────────────────────
 
 router.patch(
