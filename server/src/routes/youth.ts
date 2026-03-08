@@ -104,7 +104,7 @@ router.get(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const youthUser = await prisma.user.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       select: {
         id: true,
         name: true,
@@ -209,7 +209,7 @@ router.patch(
   authorize("COORDINATOR"),
   asyncHandler(async (req: Request, res: Response) => {
     const youthUser = await prisma.user.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       select: { role: true, youthProfile: { select: { id: true, isVetted: true } } },
     });
 

@@ -8,38 +8,24 @@ RUN npm ci
 COPY client/ .
 RUN npm run build
 
-# ── Stage 2: Build Express server ────────────────────────────────────────────
-FROM node:20-alpine AS server-builder
-WORKDIR /app/server
-
-COPY server/package*.json ./
-RUN npm ci
-
-COPY server/prisma ./prisma/
-COPY server/prisma.config.ts ./
-RUN npx prisma generate
-
-COPY server/tsconfig.json ./
-COPY server/src ./src/
-RUN npx tsc || true
-
-# ── Stage 3: Production runtime ─────────────────────────────────────────────
+# ── Stage 2: Production runtime ─────────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Install production deps for server
+# Install all deps (tsx needed at runtime for Prisma generated .ts files)
 COPY server/package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
-# Re-generate Prisma client for this platform
+# Generate Prisma client
 COPY server/prisma ./prisma/
 COPY server/prisma.config.ts ./
 RUN npx prisma generate
 
-# Copy compiled server
-COPY --from=server-builder /app/server/dist ./dist
+# Copy server source (tsx runs TypeScript directly, no tsc build needed)
+COPY server/tsconfig.json ./
+COPY server/src ./src/
 
 # Copy built client into client-dist (served by Express in production)
 COPY --from=client-builder /app/client/dist ./client-dist

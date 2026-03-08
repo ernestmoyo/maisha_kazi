@@ -172,10 +172,10 @@ router.get(
         completedJobs,
         totalYouth,
         totalClients,
-        totalRevenue: revenueResult._sum.fee ?? 0,
-        averageRating: ratingResult._avg.rating ?? 0,
+        totalRevenue: revenueResult._sum?.fee ?? 0,
+        averageRating: ratingResult._avg?.rating ?? 0,
       },
-      jobsByServiceType: jobsByServiceType.map((g: { serviceType: string; _count: number }) => ({
+      jobsByServiceType: jobsByServiceType.map((g) => ({
         serviceType: g.serviceType,
         count: g._count,
       })),
@@ -191,7 +191,7 @@ router.get(
   "/csr/:clientId",
   authorize("COORDINATOR"),
   asyncHandler(async (req: Request, res: Response) => {
-    const clientId = req.params.clientId;
+    const clientId = req.params.clientId as string;
 
     const clientUser = await prisma.user.findUnique({
       where: { id: clientId },
@@ -307,16 +307,16 @@ router.get(
       summary: {
         totalJobs: jobStats._count,
         totalYouthPaid: distinctYouth.length,
-        totalAmount: jobStats._sum.fee ?? 0,
-        totalYouthEarnings: jobStats._sum.youthEarning ?? 0,
-        totalMaishaFees: jobStats._sum.maishaCut ?? 0,
+        totalAmount: jobStats._sum?.fee ?? 0,
+        totalYouthEarnings: jobStats._sum?.youthEarning ?? 0,
+        totalMaishaFees: jobStats._sum?.maishaCut ?? 0,
       },
-      jobsByServiceType: jobsByServiceType.map((g: { serviceType: string; _count: number; _sum: { fee: unknown } }) => ({
+      jobsByServiceType: jobsByServiceType.map((g) => ({
         serviceType: g.serviceType,
         count: g._count,
-        totalFee: g._sum.fee ?? 0,
+        totalFee: g._sum?.fee ?? 0,
       })),
-      jobsByStatus: jobsByStatus.map((g: { status: string; _count: number }) => ({
+      jobsByStatus: jobsByStatus.map((g) => ({
         status: g.status,
         count: g._count,
       })),

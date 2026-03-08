@@ -150,7 +150,7 @@ router.get(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const job = await prisma.job.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: {
         client: { select: { id: true, name: true, email: true } },
         youth: {
@@ -197,7 +197,7 @@ router.patch(
   asyncHandler(async (req: Request, res: Response) => {
     const { youthId } = assignJobSchema.parse(req.body);
 
-    const job = await prisma.job.findUnique({ where: { id: req.params.id } });
+    const job = await prisma.job.findUnique({ where: { id: req.params.id as string } });
     if (!job) {
       throw new AppError("Job not found.", 404);
     }
@@ -221,7 +221,7 @@ router.patch(
     const youthEarning = parseFloat((fee * 0.8).toFixed(2));
 
     const updatedJob = await prisma.job.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: {
         youthId,
         status: "ASSIGNED",
@@ -255,7 +255,7 @@ router.patch(
     const user = req.user!;
     const { status: newStatus } = updateStatusSchema.parse(req.body);
 
-    const job = await prisma.job.findUnique({ where: { id: req.params.id } });
+    const job = await prisma.job.findUnique({ where: { id: req.params.id as string } });
     if (!job) {
       throw new AppError("Job not found.", 404);
     }
@@ -293,7 +293,7 @@ router.patch(
     }
 
     const updatedJob = await prisma.job.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: updateData,
       include: {
         client: { select: { id: true, name: true, email: true } },
@@ -322,7 +322,7 @@ router.patch(
   asyncHandler(async (req: Request, res: Response) => {
     const user = req.user!;
 
-    const job = await prisma.job.findUnique({ where: { id: req.params.id } });
+    const job = await prisma.job.findUnique({ where: { id: req.params.id as string } });
     if (!job) {
       throw new AppError("Job not found.", 404);
     }
@@ -336,7 +336,7 @@ router.patch(
     }
 
     const updatedJob = await prisma.job.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: { clientConfirmed: true },
       include: {
         client: { select: { id: true, name: true, email: true } },

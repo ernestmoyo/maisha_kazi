@@ -72,7 +72,7 @@ router.patch(
   "/:id/read",
   asyncHandler(async (req: Request, res: Response) => {
     const notification = await prisma.notification.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
     });
 
     if (!notification) {

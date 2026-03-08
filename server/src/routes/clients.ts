@@ -69,7 +69,7 @@ router.get(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const clientUser = await prisma.user.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       select: {
         id: true,
         name: true,
@@ -106,7 +106,7 @@ router.get(
   "/:id/csr-report",
   asyncHandler(async (req: Request, res: Response) => {
     const user = req.user!;
-    const clientId = req.params.id;
+    const clientId = req.params.id as string;
 
     // Only the client themselves or a coordinator can view CSR reports
     if (user.role === "CLIENT" && user.id !== clientId) {
@@ -189,12 +189,12 @@ router.get(
       },
       totalJobs: jobStats._count,
       totalYouthPaid: distinctYouth.length,
-      totalAmount: jobStats._sum.fee ?? 0,
-      totalYouthEarnings: jobStats._sum.youthEarning ?? 0,
-      jobsByServiceType: jobsByServiceType.map((g: { serviceType: string; _count: number; _sum: { fee: unknown } }) => ({
+      totalAmount: jobStats._sum?.fee ?? 0,
+      totalYouthEarnings: jobStats._sum?.youthEarning ?? 0,
+      jobsByServiceType: jobsByServiceType.map((g) => ({
         serviceType: g.serviceType,
         count: g._count,
-        totalFee: g._sum.fee ?? 0,
+        totalFee: g._sum?.fee ?? 0,
       })),
       monthlyTrend,
     });

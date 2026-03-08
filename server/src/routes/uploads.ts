@@ -24,7 +24,7 @@ router.post(
   uploadProofPhoto,
   asyncHandler(async (req: Request, res: Response) => {
     const user = req.user!;
-    const jobId = req.params.id;
+    const jobId = req.params.id as string;
 
     if (!req.file) {
       throw new AppError("No photo file uploaded.", 400);
