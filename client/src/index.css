@@ -1,0 +1,221 @@
+@import "tailwindcss";
+
+/* ============================================
+   Google Fonts: Playfair Display + DM Sans
+   ============================================ */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+
+/* ============================================
+   Tailwind @theme: Custom Design Tokens
+   ============================================ */
+@theme {
+  /* Colors - African Modern Palette */
+  --color-primary: #1B4332;
+  --color-primary-light: #2D6A4F;
+  --color-primary-dark: #0F2921;
+
+  --color-accent: #D97706;
+  --color-accent-light: #F59E0B;
+  --color-accent-dark: #B45309;
+
+  --color-surface: #FEFCE8;
+  --color-surface-warm: #FEF9C3;
+  --color-surface-cool: #FFFBEB;
+
+  --color-dark: #1C1917;
+  --color-dark-muted: #44403C;
+  --color-dark-subtle: #78716C;
+
+  --color-success: #15803D;
+  --color-error: #DC2626;
+  --color-info: #0369A1;
+
+  /* Fonts */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+
+  /* Spacing - consistent scale */
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  --spacing-128: 32rem;
+}
+
+/* ============================================
+   CSS Custom Properties (for JS access)
+   ============================================ */
+:root {
+  --maisha-primary: #1B4332;
+  --maisha-primary-light: #2D6A4F;
+  --maisha-primary-dark: #0F2921;
+  --maisha-accent: #D97706;
+  --maisha-accent-light: #F59E0B;
+  --maisha-accent-dark: #B45309;
+  --maisha-surface: #FEFCE8;
+  --maisha-surface-warm: #FEF9C3;
+  --maisha-surface-cool: #FFFBEB;
+  --maisha-dark: #1C1917;
+  --maisha-dark-muted: #44403C;
+  --maisha-dark-subtle: #78716C;
+  --maisha-success: #15803D;
+  --maisha-error: #DC2626;
+  --maisha-info: #0369A1;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+body {
+  margin: 0;
+  font-family: "DM Sans", system-ui, sans-serif;
+  color: var(--maisha-dark);
+  background-color: var(--maisha-surface);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+/* ============================================
+   Custom Utility Classes
+   ============================================ */
+
+/* Text gradient for headings */
+@utility text-gradient-primary {
+  background: linear-gradient(135deg, #1B4332, #2D6A4F);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility text-gradient-accent {
+  background: linear-gradient(135deg, #D97706, #F59E0B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism card */
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+}
+
+/* Primary card with subtle shadow */
+@utility card-elevated {
+  background: white;
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 3px rgba(28, 25, 23, 0.06),
+    0 4px 12px rgba(28, 25, 23, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@utility card-elevated-hover {
+  box-shadow:
+    0 4px 12px rgba(28, 25, 23, 0.1),
+    0 8px 24px rgba(28, 25, 23, 0.06);
+  transform: translateY(-2px);
+}
+
+/* African geometric pattern background */
+@utility bg-african-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231B4332' fill-opacity='0.05'%3E%3Cpath d='M30 0L60 30L30 60L0 30z'/%3E%3Cpath d='M30 10L50 30L30 50L10 30z' fill-opacity='0.03'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Accent border decoration */
+@utility border-accent-gradient {
+  border-image: linear-gradient(135deg, #D97706, #F59E0B, #D97706) 1;
+}
+
+/* Section divider with African motif */
+@utility divider-african {
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #D97706 20%,
+    #1B4332 50%,
+    #D97706 80%,
+    transparent
+  );
+  border-radius: 2px;
+}
+
+/* Warm surface gradient background */
+@utility bg-surface-gradient {
+  background: linear-gradient(180deg, #FEFCE8 0%, #FFFBEB 50%, #FEF9C3 100%);
+}
+
+/* Primary button base style */
+@utility btn-primary {
+  background-color: #1B4332;
+  color: white;
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+@utility btn-primary-hover {
+  background-color: #2D6A4F;
+}
+
+@utility btn-primary-active {
+  transform: scale(0.98);
+}
+
+/* Accent button style */
+@utility btn-accent {
+  background-color: #D97706;
+  color: white;
+  font-weight: 600;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+@utility btn-accent-hover {
+  background-color: #B45309;
+}
+
+/* Focus ring for accessibility */
+@utility focus-ring-primary {
+  outline: 2px solid #1B4332;
+  outline-offset: 2px;
+}
+
+@utility focus-ring-accent {
+  outline: 2px solid #D97706;
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #FEF9C3;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #78716C;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #44403C;
+  }
+}

@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  YOUTH
+  COORDINATOR
+  CLIENT
+}
+
+enum ServiceType {
+  CAR_WASH
+  CLEANING
+  GARDENING
+  WINDOW_FIX
+  HANDYWORK
+  OTHER
+}
+
+enum JobStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum PaymentType {
+  YOUTH_EARNING
+  MAISHA_FEE
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum NotificationType {
+  JOB_ASSIGNED
+  JOB_COMPLETED
+  JOB_REQUEST
+  PAYMENT_PROCESSED
+  DISPUTE_RAISED
+  GENERAL
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  youthProfile  YouthProfile?
+  clientProfile ClientProfile?
+
+  assignedJobs    Job[]          @relation("YouthJobs")
+  coordinatedJobs Job[]          @relation("CoordinatorJobs")
+  clientJobs      Job[]          @relation("ClientJobs")
+  applications    JobApplication[]
+  notifications   Notification[]
+  vettedYouth     YouthProfile[] @relation("VettedBy")
+
+  @@map("users")
+}
+
+model YouthProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio                String?
+  location           String?
+  locationLat        Float?
+  locationLng        Float?
+  skills             String[]
+  rating             Float    @default(0)
+  totalJobsCompleted Int      @default(0)
+  totalEarnings      Decimal  @default(0) @db.Decimal(12, 2)
+  isVetted           Boolean  @default(false)
+  vettedAt           DateTime?
+  vettedById         String?
+  vettedBy           User?    @relation("VettedBy", fields: [vettedById], references: [id])
+  idDocumentUrl      String?
+  profilePhotoUrl    String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("youth_profiles")
+}
+
+model ClientProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgName            String
+  orgLogo            String?
+  industry           String?
+  csrBudget          Decimal? @db.Decimal(12, 2)
+  brandColor         String?
+  primaryContactName String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  csrReports CSRReport[]
+
+  @@map("client_profiles")
+}
+
+model Job {
+  id              String      @id @default(uuid())
+  title           String
+  description     String
+  serviceType     ServiceType
+  status          JobStatus   @default(OPEN)
+  clientId        String
+  client          User        @relation("ClientJobs", fields: [clientId], references: [id])
+  youthId         String?
+  youth           User?       @relation("YouthJobs", fields: [youthId], references: [id])
+  coordinatorId   String?
+  coordinator     User?       @relation("CoordinatorJobs", fields: [coordinatorId], references: [id])
+  location        String
+  locationLat     Float?
+  locationLng     Float?
+  scheduledAt     DateTime?
+  completedAt     DateTime?
+  fee             Decimal     @db.Decimal(10, 2)
+  maishaCut       Decimal?    @db.Decimal(10, 2)
+  youthEarning    Decimal?    @db.Decimal(10, 2)
+  proofPhotoUrl   String?
+  proofUploadedAt DateTime?
+  clientConfirmed Boolean     @default(false)
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  applications JobApplication[]
+  payments     Payment[]
+
+  @@map("jobs")
+}
+
+model JobApplication {
+  id        String            @id @default(uuid())
+  jobId     String
+  job       Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  youthId   String
+  youth     User              @relation(fields: [youthId], references: [id])
+  message   String?
+  status    ApplicationStatus @default(PENDING)
+  appliedAt DateTime          @default(now())
+
+  @@unique([jobId, youthId])
+  @@map("job_applications")
+}
+
+model Payment {
+  id          String        @id @default(uuid())
+  jobId       String
+  job         Job           @relation(fields: [jobId], references: [id])
+  amount      Decimal       @db.Decimal(10, 2)
+  type        PaymentType
+  status      PaymentStatus @default(PENDING)
+  processedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@map("payments")
+}
+
+model CSRReport {
+  id             String   @id @default(uuid())
+  clientId       String
+  clientProfile  ClientProfile @relation(fields: [clientId], references: [id])
+  periodStart    DateTime
+  periodEnd      DateTime
+  totalJobs      Int
+  totalYouthPaid Int
+  totalAmount    Decimal  @db.Decimal(12, 2)
+  totalImpact    String?
+  generatedAt    DateTime @default(now())
+
+  @@map("csr_reports")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  type      NotificationType @default(GENERAL)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
