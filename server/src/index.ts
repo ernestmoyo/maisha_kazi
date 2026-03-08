@@ -22,7 +22,7 @@ const envSchema = z.object({
     .string()
     .default("3001")
     .transform((val) => parseInt(val, 10)),
-  CLIENT_URL: z.string().min(1, "CLIENT_URL is required"),
+  CLIENT_URL: z.string().default("http://localhost:5173"),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
@@ -50,7 +50,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: env.NODE_ENV === "production" ? true : env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -108,6 +108,21 @@ app.use("/api/clients", clientRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api", uploadRoutes);
+
+// ─── Serve React Client in Production ───────────────────────────────────────
+
+if (env.NODE_ENV === "production") {
+  const clientDist = path.resolve(import.meta.dirname, "../../client-dist");
+  app.use(express.static(clientDist));
+
+  // SPA fallback: serve index.html for any non-API route
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+      return next();
+    }
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 
